@@ -1,9 +1,10 @@
 package com.example.nodejschatapp;
 
-import android.support.v7.app.AppCompatActivity;
+
+import android.app.Activity;
 import android.os.Bundle;
 
-public class LobbyListActivity extends AppCompatActivity {
+public class LobbyListActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
