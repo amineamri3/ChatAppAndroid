@@ -28,8 +28,6 @@ public class LoginActivity extends Activity {
 
 
         cxt = this;
-        final Button btn1 = (Button)findViewById(R.id.joinbtn);
-        final EditText et1 = (EditText)findViewById(R.id.editText1);
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
