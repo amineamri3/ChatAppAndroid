@@ -1,13 +1,18 @@
 package com.example.nodejschatapp;
 
 import android.app.Activity;
+import android.content.res.ObbInfo;
 import android.util.Log;
 
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import co.intentservice.chatui.ChatView;
 import co.intentservice.chatui.models.ChatMessage;
@@ -15,7 +20,7 @@ import co.intentservice.chatui.models.ChatMessage;
 public  class SocketManager {
     public static Socket socket;
     public static ChatActivity ui;
-
+    public static LobbyListActivity LobbyAct;
 
     public SocketManager(ChatActivity ui) {
         this.ui = ui;
@@ -23,8 +28,8 @@ public  class SocketManager {
 
     public static boolean connect(){
         try {
-            // socket = IO.socket("https://zerai-node-v3-chat-app.herokuapp.com");
-            socket = IO.socket("127.0.0.1:3000");
+             socket = IO.socket("https://zerai-node-v3-chat-app.herokuapp.com");
+            //socket = IO.socket("127.0.0.1:3000");
             socket.connect();
             Log.d("TAG1", "socket : " + socket.connected());
 
@@ -58,12 +63,48 @@ public  class SocketManager {
 
                 }
             });
+            socket.on("response", new Emitter.Listener() {
+                @Override
+                public void call(final Object... args) {
+                    LobbyAct.runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                ArrayList<Lobby> l = new ArrayList<>();
+                                JSONArray data = (JSONArray) args[0];
+                                Log.d("D", data.toString());
+                                for (int i =0; i<data.length();i++) {
+                                    Lobby lob;
+                                    JSONObject obj = data.getJSONObject(i);
+                                    int count =0;
+                                    boolean lock = false;
+                                    if(obj.getInt("psw") == 1) lock = true;
+                                    if(obj.getInt("inroom") > 0) count = obj.getInt("inroom");
+                                    lob = new Lobby(count,obj.getString("roomname"),lock);
+                                    l.add(lob);
+                                }
+                                LobbyAct.UpdateList(l);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+
+                }
+            });
             return true;
         }catch(Exception e){
             e.printStackTrace();
             return false;
         }
     }
+    public static void updateLobby(LobbyListActivity q){
+        LobbyAct = q;
+        socket.emit("requestrooms");
+
+    }
+
+
 
     public static void joinRoom(String room,String name){
         socket.emit("join", name, room);

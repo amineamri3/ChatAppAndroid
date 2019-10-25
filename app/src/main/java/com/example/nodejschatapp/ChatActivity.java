@@ -36,7 +36,7 @@ public class ChatActivity extends AppCompatActivity
         cxt = this;
         chatView =findViewById(R.id.chat_view);
         mng = new SocketManager(this);
-        mng.connect();
+        //mng.connect();
         Intent i = getIntent();
         mng.joinRoom(i.getStringExtra("room"),i.getStringExtra("name"));
 
